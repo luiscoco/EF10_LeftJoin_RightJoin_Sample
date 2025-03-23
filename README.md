@@ -36,6 +36,72 @@ We connect to the SSMS with the password: Luiscoco123456
 
 ![image](https://github.com/user-attachments/assets/2ddf95dc-aac1-4e0b-8e09-0375deb53a3b)
 
+## 3. Create the Database and Tables in SSMS
+
+```sql
+-- Create the database
+CREATE DATABASE SchoolDB;
+GO
+
+-- Use the created database
+USE SchoolDB;
+GO
+
+-- Create Departments table
+CREATE TABLE Departments (
+    ID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(100) NOT NULL
+);
+GO
+
+-- Create Students table
+CREATE TABLE Students (
+    ID INT PRIMARY KEY IDENTITY(1,1),
+    FirstName NVARCHAR(50) NOT NULL,
+    LastName NVARCHAR(50) NOT NULL,
+    DepartmentID INT NULL FOREIGN KEY REFERENCES Departments(ID)
+);
+GO
+
+-- Insert sample data into Departments
+INSERT INTO Departments (Name) VALUES
+('Engineering'),
+('Human Resources'),
+('Marketing');
+GO
+
+-- Insert sample data into Students
+INSERT INTO Students (FirstName, LastName, DepartmentID) VALUES
+('John', 'Doe', 1),        -- Engineering
+('Jane', 'Smith', 2),      -- Human Resources
+('Michael', 'Brown', NULL),-- No Department
+('Emily', 'Davis', 3),     -- Marketing
+('Chris', 'Wilson', 1),    -- Engineering
+('Anna', 'Taylor', NULL);  -- No Department
+GO
+```
+
+We check the above queries
+
+```sql
+SELECT TOP (1000) [ID]
+      ,[Name]
+  FROM [SchoolDB].[dbo].[Departments]
+```
+
+![image](https://github.com/user-attachments/assets/0c9ae900-630c-4dc0-ab1d-97fa11262cd8)
+
+```sql
+SELECT TOP (1000) [ID]
+      ,[FirstName]
+      ,[LastName]
+      ,[DepartmentID]
+  FROM [SchoolDB].[dbo].[Students]
+```
+
+![image](https://github.com/user-attachments/assets/19e36224-97a7-45dc-8e29-e2935499244c)
+
+
 ## 3. Download and Install Visual Studio 2022 v17.4 (Preview version)
 
 Download and Install Visual Studio 2022 Preview version from this site: 
