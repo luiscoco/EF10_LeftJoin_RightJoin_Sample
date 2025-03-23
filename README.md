@@ -1,5 +1,9 @@
 # EF10_LeftJoin_RightJoin_Sample
 
+For more information about this post visit this site:
+
+https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-10.0/whatsnew#linq-and-sql-translation
+
 ## 1. Donwload and run SQL Server docker image
 
 First of all we have to run **Docker Desktop**
@@ -56,4 +60,118 @@ dotnet --version
 
 ![image](https://github.com/user-attachments/assets/274068f4-8135-42cf-b0da-76e8fc244643)
 
-## 5. 
+## 5. We create a new C# console application with .NET 10 and Visual Studio 2022 v17.4 (Preview)
+
+Run Visual Studio 2022
+
+![image](https://github.com/user-attachments/assets/73f9c2c7-4700-4c2e-89eb-1a1a49a7f33f)
+
+We create a new project
+
+![image](https://github.com/user-attachments/assets/2e36b18c-d1d8-4dc3-867c-89d57014764c)
+
+We select the project template and press the Next button
+
+![image](https://github.com/user-attachments/assets/3e3af5fe-9b3d-4f31-a541-4c6ec5164d93)
+
+We set the project name and location and press the Next button
+
+![image](https://github.com/user-attachments/assets/1d6676a0-31a4-492f-aa32-f6f52f3840e2)
+
+We select the .NET 10 frameworkd and press the Create button
+
+![image](https://github.com/user-attachments/assets/3a9a1510-6986-4421-9daa-017be34a414d)
+
+## 6. We load the Nuge packages
+
+![image](https://github.com/user-attachments/assets/39198c89-b8ea-49b9-91df-18264cbaa632)
+
+## 7. We create the project folder and files structure
+
+![image](https://github.com/user-attachments/assets/079c428a-e289-4a89-96ee-2a3dc20ecaf4)
+
+## 8. We input the Data Models code
+
+```csharp
+using System.Collections.Generic;
+using System.Text;
+
+namespace EF10_LeftJoin_RightJoin_Sample.Models
+{
+    public class Department
+    {
+        public int ID { get; set; }
+        public string? Name { get; set; } = null!;
+        public ICollection<Student> Students { get; set; } = new List<Student>();
+    }
+}
+```
+
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace EF10_LeftJoin_RightJoin_Sample.Models
+{
+    public class Student
+    {
+        public int ID { get; set; }
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public int? DepartmentID { get; set; }
+
+        public Department? Department { get; set; }
+    }
+}
+```
+
+## 9. We input the DbContext code
+
+```csharp
+using EF10_LeftJoin_RightJoin_Sample.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace EF10_LeftJoin_RightJoin_Sample.Data
+{
+    public class SchoolContext : DbContext
+    {
+        public DbSet<Student> Students { get; set; } = null!;
+        public DbSet<Department> Departments { get; set; } = null!;
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Server=localhost,1433;Database=SchoolDB;User Id=sa;Password=Luiscoco123456;TrustServerCertificate=True;");
+        }
+    }
+}
+```
+
+## 10. We input the Program.cs code
+
+```csharp
+using EF10_LeftJoin_RightJoin_Sample.Data;
+
+using var context = new SchoolContext();
+
+var leftJoinQuery = context.Students
+    .LeftJoin(
+        context.Departments,
+        student => student.DepartmentID,
+        department => department.ID,
+        (student, department) => new
+        {
+            student.FirstName,
+            student.LastName,
+            Department = department.Name ?? "[NONE]"
+        });
+
+foreach (var item in leftJoinQuery)
+{
+    Console.WriteLine($"{item.FirstName} {item.LastName} - {item.Department}");
+}
+```
