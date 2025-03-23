@@ -241,3 +241,60 @@ foreach (var item in leftJoinQuery)
     Console.WriteLine($"{item.FirstName} {item.LastName} - {item.Department}");
 }
 ```
+
+## 11. We run the application and verify the results
+
+We fun the C# console application and see the results
+
+![image](https://github.com/user-attachments/assets/5b2fa3a7-fbfd-497e-a400-0e011a9ae4d6)
+
+We compare the result running the query in SSMS:
+
+```sql
+SELECT s.FirstName, s.LastName, ISNULL(d.Name, '[NONE]') AS Department
+FROM Students s
+LEFT JOIN Departments d ON s.DepartmentID = d.ID
+```
+
+![image](https://github.com/user-attachments/assets/ce9dccc1-8b8f-48f1-b72f-1d1f8c4e867f)
+
+## 12. We can also customize the application for the RightJoin command
+
+```csharp
+using EF10_LeftJoin_RightJoin_Sample.Data;
+
+using var context = new SchoolContext();
+
+var rightJoinQuery = context.Students
+    .RightJoin(
+        context.Departments,
+        student => student.DepartmentID,
+        department => department.ID,
+        (student, department) => new
+        {
+            StudentName = student != null ? $"{student.FirstName} {student.LastName}" : "[NONE]",
+            department.Name
+        });
+
+foreach (var item in rightJoinQuery)
+{
+    Console.WriteLine($"{item.StudentName} - {item.Name}");
+}
+```
+
+## 13. We run the application and verify the results
+
+We fun the C# console application and see the results
+
+![image](https://github.com/user-attachments/assets/421164e0-c0fa-4b42-9236-b2e778df268b)
+
+We compare the result running the query in SSMS:
+
+```sql
+SELECT ISNULL(s.FirstName + ' ' + s.LastName, '[NONE]') AS StudentName, d.Name
+FROM Students s
+RIGHT JOIN Departments d ON s.DepartmentID = d.ID
+```
+
+![image](https://github.com/user-attachments/assets/fd69ed35-e07e-4930-835d-921be70f58f0)
+
